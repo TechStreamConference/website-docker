@@ -1,0 +1,11 @@
+FROM node:22-bookworm
+
+RUN mkdir -p /frontend
+WORKDIR /frontend
+
+COPY website-frontend/package* /frontend/
+RUN npm install
+
+COPY website-frontend/ /frontend/
+
+CMD bash -c 'npm run check ; npm run dev'

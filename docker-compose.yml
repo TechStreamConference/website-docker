@@ -1,6 +1,41 @@
 services:
-  app:
+  php:
     build:
       context: .
+      dockerfile: Dockerfile-php
     ports:
-      - "8321:80"
+      - "8321:8321"
+    depends_on:
+      - node
+      - mariadb
+    environment:
+      database_default_hostname: mariadb
+      database_default_password: my-super-secret
+      database_default_database: tech-stream-conf
+      database_test_hostname: mariadb
+      database_test_password: my-super-secret
+      database_test_database: tech-stream-conf-test
+    volumes:
+      - type: bind
+        source: website-backend
+        target: /var/www/html/backend
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile-node
+    ports:
+      - "5173:5173"  # for testing
+    volumes:
+      - type: bind
+        source: website-frontend
+        target: /frontend
+  mariadb:
+    image: mariadb:11.5.2-noble
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: my-super-secret
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8322:8080"

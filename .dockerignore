@@ -1,3 +1,6 @@
 .git
 */.git
 */.github
+website-frontend/node_modules
+website-frontend/.svelte-kit
+website-backend/vendor
