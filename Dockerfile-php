@@ -25,16 +25,17 @@ RUN cd /etc/apache2/mods-enabled/ \
     && ln -s ../mods-available/proxy.load proxy.load \
     && ln -s ../mods-available/proxy.conf proxy.conf \
     && ln -s ../mods-available/proxy_http.load proxy_http.load \
-    && ln -s ../mods-available/proxy_wstunnel.load proxy_wstunnel.load \
     && ln -s ../mods-available/headers.load headers.load \
     && ln -s ../mods-available/rewrite.load rewrite.load 
 RUN ls -la /etc/apache2/mods-enabled/ && apachectl configtest
 
-RUN mkdir -p backend
-COPY website-backend/composer.* backend/
-RUN composer -d backend install
+RUN mkdir -p /var/www/api
+COPY website-backend/composer.* /var/www/api/
+RUN composer -d /var/www/api install
 
-COPY website-backend/ backend/
+COPY website-backend/ /var/www/api/
 COPY website-frontend/static/favicon.ico default/index.php /var/www/html/
 
 RUN apt-get -y update && apt-get install -y default-mysql-client && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+
+WORKDIR /var/www/api
