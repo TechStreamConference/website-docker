@@ -1,0 +1,20 @@
+server {
+    listen 80;
+
+    # Serve frontend
+    location / {
+        proxy_pass http://test_conf_frontend:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # Proxy API requests to backend
+    location /api/ {
+        proxy_pass http://test_conf_backend:80/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+
+        # Make sure cookies work
+        proxy_cookie_path / /api;
+    }
+}

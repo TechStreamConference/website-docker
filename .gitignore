@@ -1,0 +1,10 @@
+data/**
+!data/database
+!data/database/.gitkeep
+!data/uploads
+!data/uploads/.gitkeep
+.compose_env
+.env
+.container/apache/000-default.conf
+.container/apache/ports.conf
+.container/nginx/default.conf
