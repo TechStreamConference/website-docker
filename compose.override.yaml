@@ -9,8 +9,8 @@ services:
       - ./container/dev/vite/vite.config.ts:/app/vite.config.ts # Vite configuration that supports hot reloading.
       - ./frontend:/app # The frontend code.
     environment:
-      - PUBLIC_API_BASE_URL_SSR=http://test_conf_backend:80
-      - PUBLIC_API_BASE_URL_CSR=http://localhost:8080/api
+      - PUBLIC_API_BASE_URL_SSR=http://test_conf_backend
+      - PUBLIC_API_BASE_URL_CSR=http://localhost/api
 
   test_conf_backend:
     volumes:
