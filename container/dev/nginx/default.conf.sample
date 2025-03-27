@@ -23,4 +23,12 @@ server {
     location /api/ {
         proxy_pass http://test_conf_backend:80/;
     }
+
+    location /phpmyadmin/ {
+        proxy_pass http://test_conf_phpmyadmin:80/;
+    }
+
+    location /mail/ {
+        proxy_pass http://test_conf_mail:80/;
+    }
 }

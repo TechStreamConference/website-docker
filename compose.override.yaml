@@ -1,3 +1,5 @@
+# The overrides in this file are for **development only**!
+
 services:
   test_conf_nginx:
     volumes:
@@ -20,9 +22,21 @@ services:
       - /var/www/html/vendor # Prevent the vendor folder from being overwritten.
       - ./backend:/var/www/html # The backend code.
 
+  test_conf_mail:
+    container_name: test_conf_mail
+    image: changemakerstudiosus/papercut-smtp:latest
+
+  test_conf_phpmyadmin:
+    container_name: test_conf_phpmyadmin
+    image: phpmyadmin:5.2.2-apache
+    environment:
+      - PMA_HOST=test_conf_db
+      - PMA_USER=test_conf_user
+      - PMA_PASSWORD=1234
+
   test_conf_db:
     image: mariadb:11.4.5
     container_name: test_conf_db
     ports:
-      - "3306:3306" # Make database accessible from the host for debugging (only in development).
+      - "3306:3306" # Make database accessible from the host (e.g. to connect using JetBrains DataGrip).
     env_file: ./container/dev/.compose_env # This file includes the database configuration env variables.
