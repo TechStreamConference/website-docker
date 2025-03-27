@@ -21,10 +21,14 @@ services:
       - ./container/dev/apache/ports.conf:/etc/apache2/ports.conf # Apache main config (to change the port if necessary).
       - /var/www/html/vendor # Prevent the vendor folder from being overwritten.
       - ./backend:/var/www/html # The backend code.
+    depends_on:
+      - test_conf_mail
 
   test_conf_mail:
     container_name: test_conf_mail
     image: changemakerstudiosus/papercut-smtp:latest
+    ports:
+      - "8080:80"
 
   test_conf_phpmyadmin:
     container_name: test_conf_phpmyadmin

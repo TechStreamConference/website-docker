@@ -27,8 +27,4 @@ server {
     location /phpmyadmin/ {
         proxy_pass http://test_conf_phpmyadmin:80/;
     }
-
-    location /mail/ {
-        proxy_pass http://test_conf_mail:80/;
-    }
 }
