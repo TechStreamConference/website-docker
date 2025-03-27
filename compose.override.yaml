@@ -1,0 +1,28 @@
+services:
+  test_conf_nginx:
+    volumes:
+      - ./container/dev/nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+  test_conf_frontend:
+    volumes:
+      - /var/www/html/node_modules # Prevent the node_modules folder from being overwritten.
+      - ./container/dev/vite/vite.config.ts:/app/vite.config.ts # Vite configuration that supports hot reloading.
+      - ./frontend:/app # The frontend code.
+    environment:
+      - PUBLIC_API_BASE_URL_SSR=http://test_conf_backend:80
+      - PUBLIC_API_BASE_URL_CSR=http://localhost:8080/api
+
+  test_conf_backend:
+    volumes:
+      - ./container/dev/.env:/var/www/html/.env # Environment file for CodeIgniter4 configuration.
+      - ./container/dev/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf # Apache config to configure CORS.
+      - ./container/dev/apache/ports.conf:/etc/apache2/ports.conf # Apache main config (to change the port if necessary).
+      - /var/www/html/vendor # Prevent the vendor folder from being overwritten.
+      - ./backend:/var/www/html # The backend code.
+
+  test_conf_db:
+    image: mariadb:11.4.5
+    container_name: test_conf_db
+    ports:
+      - "3306:3306" # Make database accessible from the host for debugging (only in development).
+    env_file: ./container/dev/.compose_env # This file includes the database configuration env variables.

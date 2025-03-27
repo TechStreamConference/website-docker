@@ -1,0 +1,46 @@
+# Base compose file for the project. For development, the `docker-compose.override.yml`
+# will automatically add the necessary things to this file.
+#
+# TODO: For production?
+name: test_conf
+services:
+  test_conf_nginx:
+    image: nginx:1.26.3-bookworm
+    container_name: test_conf_nginx
+    ports:
+      - "8080:80" # This is the port that the complete website will be exposed on.
+    depends_on:
+      - test_conf_frontend
+      - test_conf_backend
+    restart: unless-stopped
+
+  test_conf_frontend:
+    container_name: test_conf_frontend
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+      target: dev
+    restart: unless-stopped
+    depends_on:
+      - test_conf_backend
+
+  test_conf_backend:
+    container_name: test_conf_backend
+    build:
+      context: backend
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./data/uploads:/var/www/html/writable/uploads # For file uploads.
+      - ./data/cache:/var/www/html/writable/cache # For cache.
+      - ./container/index.html:/var/www/html/writable/uploads/index.html # File that prevents direct directory access.
+    restart: unless-stopped
+    depends_on:
+      - test_conf_db
+
+  test_conf_db:
+    image: mariadb:11.4.5
+    container_name: test_conf_db
+    volumes:
+      - ./data/database:/var/lib/mysql
+    restart: unless-stopped

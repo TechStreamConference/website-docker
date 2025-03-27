@@ -1,10 +1,11 @@
+container/**/*.env
+container/**/*.compose_env
+container/**/*.conf
+container/**/vite.config.ts
 data/**
+!data/cache
+!data/cache/.gitkeep
 !data/database
 !data/database/.gitkeep
 !data/uploads
 !data/uploads/.gitkeep
-.compose_env
-.env
-.container/apache/000-default.conf
-.container/apache/ports.conf
-.container/nginx/default.conf

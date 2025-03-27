@@ -1,4 +1,11 @@
 <VirtualHost *:80>
+     <IfModule mod_headers.c>
+        Header always set Access-Control-Allow-Origin "*"
+        Header always set Access-Control-Allow-Methods "GET,POST,PUT,DELETE,OPTIONS"
+        Header always set Access-Control-Allow-Credentials "true"
+        Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Origin, Accept, User-Token, Cookie"
+    </IfModule>
+
     # The ServerName directive sets the request scheme, hostname and port that
     # the server uses to identify itself. This is used when creating
     # redirection URLs. In the context of virtual hosts, the ServerName
