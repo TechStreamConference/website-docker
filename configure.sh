@@ -35,6 +35,9 @@ docker compose exec test_conf_backend bash -c "php spark db:seed MainSeeder2024"
 echo "Copying images..."
 sudo cp ./backend/writable/uploads/* ./data/uploads/
 
+docker compose exec test_conf_db bash -c "touch /var/lib/mysql/.gitkeep"
+docker compose exec test_conf_backend bash -c "touch /var/www/html/writable/uploads/.gitkeep"
+
 echo "Setting file permissions..."
 docker compose exec test_conf_backend bash -c "chown -R www-data:www-data /var/www/html/writable"
 
