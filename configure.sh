@@ -3,12 +3,12 @@
 set -e
 
 if [ -d "data" ]; then
-    read -p "The folder 'data' (including the database) will get deleted. Do you want to continue? (y/n): " answer
+    read -p "Do you want the 'data' folder to be deleted (recommended for initial setup)? (y/N): " answer
     if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
         sudo rm -rf data
         echo "Folder 'data' deleted."
     else
-        echo "Folder 'data' was not deleted."
+        echo "Folder 'data' not deleted. Proceeding..."
     fi
 else
     echo "Folder 'data' does not exist."
