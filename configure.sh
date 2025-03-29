@@ -20,6 +20,8 @@ find container -type f -name '*.sample' -exec sh -c 'for f; do cp "$f" "${f%.sam
 echo "Building and starting the containers..."
 docker compose up -d --build --force-recreate
 
+docker compose exec test_conf_backend bash -c "composer install --ignore-platform-reqs"
+
 # Especially when using WSL2, it may take some time until the containers are up and running.
 # Therefore, we wait until the database is ready before running the migrations to prevent errors.
 echo "Waiting for database to be ready..."

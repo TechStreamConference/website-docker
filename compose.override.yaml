@@ -19,7 +19,6 @@ services:
       - ./container/dev/.env:/var/www/html/.env # Environment file for CodeIgniter4 configuration.
       - ./container/dev/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf # Apache config to configure CORS.
       - ./container/dev/apache/ports.conf:/etc/apache2/ports.conf # Apache main config (to change the port if necessary).
-      - /var/www/html/vendor/ # Prevent the vendor folder from being overwritten.
       - ./backend:/var/www/html # The backend code.
     depends_on:
       - test_conf_mail
