@@ -1,0 +1,24 @@
+services:
+  test_conf_nginx:
+    volumes:
+      - ./container/prod/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "127.0.0.1:8082:80" # This is the port that the complete website will be exposed on.
+
+  test_conf_frontend:
+    image: ghcr.io/techstreamconference/website-frontend:v0.3.0
+    environment:
+      - PUBLIC_API_BASE_URL_SSR=http://test_conf_backend
+      - PUBLIC_API_BASE_URL_CSR=http://localhost:8082/api
+
+  test_conf_backend:
+    image: ghcr.io/techstreamconference/website-backend:v0.7.0
+    volumes:
+      - ./container/prod/.env:/var/www/html/.env # Environment file for CodeIgniter4 configuration.
+      - ./container/prod/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf # Apache config to configure CORS.
+      - ./container/prod/apache/ports.conf:/etc/apache2/ports.conf # Apache main config (to change the port if necessary).
+
+  test_conf_db:
+    ports:
+        - "127.0.0.1:6033:3306" # Make database accessible from the host (e.g. to connect using JetBrains DataGrip).
+    env_file: ./container/prod/.compose_env # This file includes the database configuration env variables.
