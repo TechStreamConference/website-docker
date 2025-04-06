@@ -9,7 +9,6 @@ services:
     volumes:
       - ./container/dev/vite/vite.config.ts:/app/vite.config.ts # Vite configuration that supports hot reloading.
       - ./frontend:/app # The frontend code.
-      - /app/node_modules/ # Prevent the node_modules folder from being overwritten.
     environment:
       - PUBLIC_API_BASE_URL_SSR=http://test_conf_backend
       - PUBLIC_API_BASE_URL_CSR=http://localhost/api
@@ -19,7 +18,6 @@ services:
       - ./container/dev/.env:/var/www/html/.env # Environment file for CodeIgniter4 configuration.
       - ./container/dev/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf # Apache config to configure CORS.
       - ./container/dev/apache/ports.conf:/etc/apache2/ports.conf # Apache main config (to change the port if necessary).
-      - /var/www/html/vendor/ # Prevent the vendor folder from being overwritten.
       - ./backend:/var/www/html # The backend code.
     depends_on:
       - test_conf_mail
