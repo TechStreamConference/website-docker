@@ -9,6 +9,8 @@ services:
     volumes:
       - ./container/dev/vite/vite.config.ts:/app/vite.config.ts # Vite configuration that supports hot reloading.
       - ./frontend:/app # The frontend code.
+      - /app/node_modules # This is needed to ensure that the node_modules directory is not overwritten by the host.
+      - /app/.svelte-kit
     environment:
       - PUBLIC_API_BASE_URL_SSR=http://test_conf_backend
       - PUBLIC_API_BASE_URL_CSR=http://localhost/api
@@ -19,6 +21,7 @@ services:
       - ./container/dev/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf # Apache config to configure CORS.
       - ./container/dev/apache/ports.conf:/etc/apache2/ports.conf # Apache main config (to change the port if necessary).
       - ./backend:/var/www/html # The backend code.
+      - /var/www/html/vendor
     depends_on:
       - test_conf_mail
 

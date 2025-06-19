@@ -14,8 +14,55 @@ else
     echo "Folder 'data' does not exist."
 fi
 
+echo "Building the backend image (dev_dependencies stage only)..."
+docker buildx build --target dev_dependencies -t test_conf_backend ./backend
+
+# Restore vendor folder if missing or empty
+if [ ! -d "./backend/vendor" ] || [ -z "$(ls -A ./backend/vendor 2>/dev/null)" ]; then
+    echo "Restoring 'vendor' folder from image..."
+
+    # Create temp container from built image
+    temp_container=$(docker create test_conf_backend)
+
+    docker cp "$temp_container:/app/vendor/." ./backend/vendor/
+
+    docker rm "$temp_container"
+
+    echo "Fixing vendor folder ownership..."
+    sudo chown -R "$(id -u):$(id -g)" ./backend/vendor
+else
+    echo "'vendor' folder already exists and is not empty. Skipping restore."
+fi
+
+echo "Building the frontend image (dev_dependencies stage only)..."
+docker buildx build --target dev -t test_conf_frontend ./frontend
+
+# Restore node_modules folder if missing or empty
+if [ ! -d "./frontend/node_modules" ] || [ -z "$(ls -A ./frontend/node_modules 2>/dev/null)" ]; then
+    echo "Restoring 'node_modules' folder from image..."
+
+    # Create temp container from built image
+    temp_container=$(docker create test_conf_frontend)
+
+    docker cp "$temp_container:/app/node_modules/." ./frontend/node_modules/
+
+    docker rm "$temp_container"
+
+    echo "Fixing node_modules folder ownership..."
+    sudo chown -R "$(id -u):$(id -g)" ./frontend/node_modules
+else
+    echo "'node_modules' folder already exists and is not empty. Skipping restore."
+fi
+
 echo "Copying configuration files..."
-find container -type f -name '*.sample' -exec sh -c 'for f; do cp "$f" "${f%.sample}"; done' sh {} +
+find container -type f -name '*.sample' -exec sh -c '
+  for f; do
+    target="${f%.sample}"
+    if [ ! -e "$target" ]; then
+      cp "$f" "$target"
+    fi
+  done
+' sh {} +
 
 echo "Building and starting the containers..."
 docker compose up -d --build --force-recreate
