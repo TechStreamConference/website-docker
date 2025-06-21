@@ -2,6 +2,9 @@
 
 set -e
 
+export HOST_UID=$(id -u)
+export HOST_GID=$(id -g)
+
 if [ -d "data" ]; then
     read -p "Do you want the 'data' folder to be deleted (recommended for initial setup)? (y/N): " answer
     if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
@@ -15,7 +18,7 @@ else
 fi
 
 echo "Building the backend image (dev_dependencies stage only)..."
-docker buildx build --target dev_dependencies -t test_conf_backend ./backend
+docker buildx build --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) --target dev_dependencies -t test_conf_backend ./backend
 
 # Restore vendor folder if missing or empty
 if [ ! -d "./backend/vendor" ] || [ -z "$(ls -A ./backend/vendor 2>/dev/null)" ]; then
@@ -35,7 +38,7 @@ else
 fi
 
 echo "Building the frontend image (dev_dependencies stage only)..."
-docker buildx build --target dev -t test_conf_frontend ./frontend
+docker buildx build --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) --target dev -t test_conf_frontend ./frontend
 
 # Restore node_modules folder if missing or empty
 if [ ! -d "./frontend/node_modules" ] || [ -z "$(ls -A ./frontend/node_modules 2>/dev/null)" ]; then
@@ -67,6 +70,9 @@ find container -type f -name '*.sample' -exec sh -c '
 echo "Building and starting the containers..."
 docker compose up -d --build --force-recreate
 
+echo "Setting file permissions..."
+docker compose exec -u root test_conf_backend bash -c "chown -R ${HOST_UID}:${HOST_GID} /var/www/html/writable"
+
 # Especially when using WSL2, it may take some time until the containers are up and running.
 # Therefore, we wait until the database is ready before running the migrations to prevent errors.
 echo "Waiting for database to be ready..."
@@ -85,7 +91,18 @@ sudo cp ./backend/writable/uploads/* ./data/uploads/
 docker compose exec test_conf_db bash -c "touch /var/lib/mysql/.gitkeep"
 docker compose exec test_conf_backend bash -c "touch /var/www/html/writable/uploads/.gitkeep"
 
-echo "Setting file permissions..."
-docker compose exec test_conf_backend bash -c "chown -R www-data:www-data /var/www/html/writable"
+ENV_FILE=".env"
+
+if [ -e "$ENV_FILE" ]; then
+  echo "'$ENV_FILE' already exists — skipping creation."
+else
+  HOST_UID=$(id -u)
+  HOST_GID=$(id -g)
+  cat > "$ENV_FILE" <<EOF
+HOST_UID=$HOST_UID
+HOST_GID=$HOST_GID
+EOF
+  echo "Created '$ENV_FILE' with HOST_UID=$HOST_UID and HOST_GID=$HOST_GID."
+fi
 
 echo "All done."
