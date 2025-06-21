@@ -13,8 +13,6 @@ services:
     volumes:
       - ./container/dev/vite/vite.config.ts:/app/vite.config.ts # Vite configuration that supports hot reloading.
       - ./frontend:/app # The frontend code.
-      - /app/node_modules # This is needed to ensure that the node_modules directory is not overwritten by the host.
-      - /app/.svelte-kit
     environment:
       - PUBLIC_API_BASE_URL_SSR=http://test_conf_backend
       - PUBLIC_API_BASE_URL_CSR=http://localhost/api

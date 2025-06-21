@@ -2,8 +2,23 @@
 
 set -e
 
-export HOST_UID=$(id -u)
-export HOST_GID=$(id -g)
+ENV_FILE=".env"
+
+if [[ ! -f $ENV_FILE ]]; then
+  echo "Creating $ENV_FILE with HOST_UID and HOST_GID..."
+  echo "HOST_UID=$(id -u)" > "$ENV_FILE"
+  echo "HOST_GID=$(id -g)" >> "$ENV_FILE"
+else
+  echo "$ENV_FILE already exists. Using existing HOST_UID and HOST_GID..."
+fi
+
+# Load values into environment
+set -o allexport
+source "$ENV_FILE"
+set +o allexport
+
+echo "HOST_UID=$HOST_UID"
+echo "HOST_GID=$HOST_GID"
 
 if [ -d "data" ]; then
     read -p "Do you want the 'data' folder to be deleted (recommended for initial setup)? (y/N): " answer
@@ -18,7 +33,7 @@ else
 fi
 
 echo "Building the backend image (dev_dependencies stage only)..."
-docker buildx build --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) --target dev_dependencies -t test_conf_backend ./backend
+docker buildx build --build-arg HOST_UID=$HOST_UID --build-arg HOST_GID=$HOST_GID --target dev_dependencies -t test_conf_backend ./backend
 
 # Restore vendor folder if missing or empty
 if [ ! -d "./backend/vendor" ] || [ -z "$(ls -A ./backend/vendor 2>/dev/null)" ]; then
@@ -38,7 +53,7 @@ else
 fi
 
 echo "Building the frontend image (dev_dependencies stage only)..."
-docker buildx build --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) --target dev -t test_conf_frontend ./frontend
+docker buildx build --build-arg HOST_UID=$HOST_UID --build-arg HOST_GID=$HOST_GID --target dev -t test_conf_frontend ./frontend
 
 # Restore node_modules folder if missing or empty
 if [ ! -d "./frontend/node_modules" ] || [ -z "$(ls -A ./frontend/node_modules 2>/dev/null)" ]; then
@@ -90,19 +105,5 @@ sudo cp ./backend/writable/uploads/* ./data/uploads/
 
 docker compose exec test_conf_db bash -c "touch /var/lib/mysql/.gitkeep"
 docker compose exec test_conf_backend bash -c "touch /var/www/html/writable/uploads/.gitkeep"
-
-ENV_FILE=".env"
-
-if [ -e "$ENV_FILE" ]; then
-  echo "'$ENV_FILE' already exists — skipping creation."
-else
-  HOST_UID=$(id -u)
-  HOST_GID=$(id -g)
-  cat > "$ENV_FILE" <<EOF
-HOST_UID=$HOST_UID
-HOST_GID=$HOST_GID
-EOF
-  echo "Created '$ENV_FILE' with HOST_UID=$HOST_UID and HOST_GID=$HOST_GID."
-fi
 
 echo "All done."
