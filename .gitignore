@@ -9,3 +9,4 @@ data/**
 !data/database/.gitkeep
 !data/uploads
 !data/uploads/.gitkeep
+.env

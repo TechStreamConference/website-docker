@@ -6,6 +6,10 @@ services:
       - ./container/dev/nginx/default.conf:/etc/nginx/conf.d/default.conf
 
   test_conf_frontend:
+    build:
+      args:
+        HOST_UID: ${HOST_UID:-1000}
+        HOST_GID: ${HOST_GID:-1000}
     volumes:
       - ./container/dev/vite/vite.config.ts:/app/vite.config.ts # Vite configuration that supports hot reloading.
       - ./frontend:/app # The frontend code.
@@ -14,6 +18,10 @@ services:
       - PUBLIC_API_BASE_URL_CSR=http://localhost/api
 
   test_conf_backend:
+    build:
+      args:
+          HOST_UID: ${HOST_UID:-1000}
+          HOST_GID: ${HOST_GID:-1000}
     volumes:
       - ./container/dev/.env:/var/www/html/.env # Environment file for CodeIgniter4 configuration.
       - ./container/dev/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf # Apache config to configure CORS.
@@ -25,12 +33,14 @@ services:
   test_conf_mail:
     container_name: test_conf_mail
     image: changemakerstudiosus/papercut-smtp:latest
+    restart: unless-stopped
     ports:
       - "8080:80"
 
   test_conf_phpmyadmin:
     container_name: test_conf_phpmyadmin
     image: phpmyadmin:5.2.2-apache
+    restart: unless-stopped
     environment:
       - PMA_HOST=test_conf_db
       - PMA_USER=test_conf_user
