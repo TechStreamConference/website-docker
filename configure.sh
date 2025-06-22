@@ -106,4 +106,20 @@ sudo cp ./backend/writable/uploads/* ./data/uploads/
 docker compose exec test_conf_db bash -c "touch /var/lib/mysql/.gitkeep"
 docker compose exec test_conf_backend bash -c "touch /var/www/html/writable/uploads/.gitkeep"
 
+# Load DB password from .compose_env
+COMPOSE_ENV_FILE="./container/dev/.compose_env"
+if [[ -f "$COMPOSE_ENV_FILE" ]]; then
+  echo "Loading MySQL credentials from $COMPOSE_ENV_FILE..."
+  set -o allexport
+  source "$COMPOSE_ENV_FILE"
+  set +o allexport
+else
+  echo "Error: $COMPOSE_ENV_FILE not found. Cannot create test database."
+  exit 1
+fi
+
+echo "Creating test database if not exists..."
+docker compose exec test_conf_db mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS test_conf_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+docker compose exec test_conf_db mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "GRANT ALL PRIVILEGES ON test_conf_test.* TO 'test_conf_user'@'%'; FLUSH PRIVILEGES;"
+
 echo "All done."
