@@ -16,6 +16,7 @@ services:
     environment:
       - PUBLIC_API_BASE_URL_SSR=http://test_conf_backend
       - PUBLIC_API_BASE_URL_CSR=http://localhost/api
+      - PUBLIC_PRINT_FETCH_IN_SERVER=true # `true` will print this
 
   test_conf_backend:
     build:
