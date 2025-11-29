@@ -36,7 +36,7 @@ services:
     image: changemakerstudiosus/papercut-smtp:latest
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8080:8080"
 
   test_conf_phpmyadmin:
     container_name: test_conf_phpmyadmin
