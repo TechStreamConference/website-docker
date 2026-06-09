@@ -99,7 +99,7 @@ done
 echo "Running database migrations..."
 docker compose exec test_conf_backend bash -c "php spark migrate:refresh"
 echo "Seeding the database..."
-docker compose exec test_conf_backend bash -c "php spark db:seed MainSeeder2024"
+docker compose exec test_conf_backend bash -c "php spark db:seed DevMainSeeder"
 echo "Copying images..."
 sudo cp ./backend/writable/uploads/* ./data/uploads/
 
